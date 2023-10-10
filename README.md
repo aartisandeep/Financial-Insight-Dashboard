@@ -4,6 +4,7 @@
 The Financial Insight Dashboard is a dynamic web application designed to provide users with an in-depth view of their financial transactions and trends. Built with Flask and SQLite, it showcases a blend of database management, web rendering, and user session management functionalities.
 
 **Features**
+
 **1.User Authentication:** Register and login functionality equipped with password hashing and session management for secure user interactions.
 
 **2.Transaction Management:** Enables users to add and view their recent transactions.
