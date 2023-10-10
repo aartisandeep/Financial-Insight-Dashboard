@@ -10,3 +10,5 @@ Data Visualization: Interactive graphical representations of spending trends, ma
 Category-wise Analysis: Allows sorting of expenses by categories and displays top expenditure areas.
 Time-wise Analysis: Insights on spending in the last 24 hours, monthly spending trends, and more.
 Data Integrity: Uses SQLite for backend data storage, ensuring reliable and consistent data handling.
+
+<img width="482" alt="Screenshot 2023-10-10 at 1 02 08 AM" src="https://github.com/aartisandeep/Financial-Insight-Dashboard/assets/26575213/614fef47-2c29-4662-9f12-11598086333a">
