@@ -5,11 +5,16 @@ The Financial Insight Dashboard is a dynamic web application designed to provide
 
 **Features**
 **1.User Authentication:** Register and login functionality equipped with password hashing and session management for secure user interactions.
-**1.Transaction Management:** Enables users to add and view their recent transactions.
-**1.Data Visualization:** Interactive graphical representations of spending trends, making it easier to understand financial habits.
-**1.Category-wise Analysis:** Allows sorting of expenses by categories and displays top expenditure areas.
-**1.Time-wise Analysis:** Insights on spending in the last 24 hours, monthly spending trends, and more.
-**1.Data Integrity:** Uses SQLite for backend data storage, ensuring reliable and consistent data handling.
+
+**2.Transaction Management:** Enables users to add and view their recent transactions.
+
+**3.Data Visualization:** Interactive graphical representations of spending trends, making it easier to understand financial habits.
+
+**4.Category-wise Analysis:** Allows sorting of expenses by categories and displays top expenditure areas.
+
+**5.Time-wise Analysis:** Insights on spending in the last 24 hours, monthly spending trends, and more.
+
+**6.Data Integrity:** Uses SQLite for backend data storage, ensuring reliable and consistent data handling.
 
 <img width="482" alt="Screenshot 2023-10-10 at 1 02 08 AM" src="https://github.com/aartisandeep/Financial-Insight-Dashboard/assets/26575213/614fef47-2c29-4662-9f12-11598086333a">
 
