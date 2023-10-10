@@ -1,0 +1,162 @@
+<!-- this code words properly till graph and all -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h2>Add New Transaction</h2>
+    <a href="{{ url_for('logout') }}" style="padding: 10px 15px; background-color: #f44336; color: white; text-decoration: none; border-radius: 4px;">Logout</a>
+    <p> </p>
+    <p> </p>
+
+    <form action="/dashboard" method="post">
+        <label for="amount">Amount:</label><br>
+        <input type="number" name="amount" required><br><br>
+
+        <label for="description">Description:</label><br>
+        <input type="text" name="description" required><br><br>
+
+        <!-- Category Dropdown Start -->
+        <label for="category">Category:</label><br>
+        <select name="category">
+            {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+            {% endfor %}
+        </select><br><br>
+        <!-- Category Dropdown End -->
+        <label for="transaction_date">Transaction Date:</label><br>
+        <input type="date" name="transaction_date" required><br><br>
+
+        <input type="submit" value="Add Transaction">
+    </form>
+
+    <h2>Total Spending Last 24h: $<span id="total_spending">0</span></h2>
+
+    <h2>Top 3 Expense Categories</h2>
+    <ul>
+        {% for category, total in top_expenses %}
+            <li><strong>{{ category }}</strong>: ${{ total }}</li>
+        {% endfor %}
+    </ul>
+    <h2>Monthly Spending Trends</h2>
+    <canvas id="monthlySpendingChart" width="400" height="100"></canvas>
+    <style>
+        #monthlySpendingChart {
+            width: 80%;  /* or 400px */
+            height: 40%; /* or 200px */
+            max-width: 600px;
+            display: block;
+            margin: 0 auto;
+        }
+    </style>
+
+    <h2>Last 10 Transactions</h2>
+    {% if transactions %}
+        <ul>
+        {% for transaction in transactions %}
+            <li>
+                <strong>Date:</strong> {{ transaction.date.strftime('%Y-%m-%d %H:%M:%S') }},
+                <strong>Amount:</strong> {{ transaction.amount }},
+                <strong>Description:</strong> {{ transaction.description }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>No transactions to display.</p>
+    {% endif %}
+
+    <script>
+        function fetchTotalSpending() {
+            fetch('/api/total_spending_last_24h')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('total_spending').innerText = data.total_spending.toFixed(2);
+                });
+        }
+        // Fetch immediately and then every 5 seconds.
+        fetchTotalSpending();
+        setInterval(fetchTotalSpending, 5000);
+
+        // Monthly spending line chart
+        var ctx = document.getElementById('monthlySpendingChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ (monthly_totals | map(attribute='month') | list if monthly_totals else []) | tojson }},
+                datasets: [{
+                    label: 'Spending ($)',
+                    data: {{ (monthly_totals | map(attribute='total_amount') | list if monthly_totals else []) | tojson }},
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            }
+        });
+    </script>
+
+</body>
+</html>
+
+<!-- below is login page code -->
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <h2>Login</h2>
+    <form action="/login" method="post">
+        {{ form.hidden_tag() }}
+
+        <label for="username">Username:</label><br>
+        {{ form.username() }}<br><br>
+
+        <label for="password">Password:</label><br>
+        {{ form.password() }}<br><br>
+
+        <input type="submit" value="Login">
+    </form>
+
+    <a href="{{ url_for('register') }}">Don't have an account? Register</a>
+</body>
+</html> -->
+
+
+
+<!-- this below code is for register page: -->
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+</head>
+<body>
+    <h2>Register</h2>
+    <form action="/register" method="post">
+        {{ form.hidden_tag() }}
+
+        <label for="username">Username:</label><br>
+        {{ form.username() }}<br><br>
+
+        <label for="email">Email:</label><br>
+        {{ form.email() }}<br><br>
+
+        <label for="password">Password:</label><br>
+        {{ form.password() }}<br><br>
+
+        <label for="confirm">Confirm Password:</label><br>
+        {{ form.confirm() }}<br><br>
+
+        <input type="submit" value="Register">
+    </form>
+
+    <a href="{{ url_for('login') }}">Already have an account? Log in</a>
+</body>
+</html> -->

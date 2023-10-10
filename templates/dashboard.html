@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            padding: 20px;
+            background-color: #f6f6f6;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        h2 {
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        form {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input[type="number"],
+        input[type="text"],
+        input[type="date"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        input[type="submit"] {
+            background-color: #007BFF;
+            color: #ffffff;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        a.logout-button {
+            display: inline-block;
+            padding: 10px 15px;
+            background-color: #f44336;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            position: absolute;
+            top: 10px; 
+            right: 10px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            padding: 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        li:last-child {
+            border-bottom: none;
+        }
+
+        input.shorter-input {
+            width: 20%;  /* Adjust this value as needed */
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <a href="{{ url_for('logout') }}" class="logout-button">Logout</a>
+        <h2>Add New Transaction</h2>
+        <!-- <h2>Add New Transaction <a href="{{ url_for('logout') }}" class="logout-button">Logout</a></h2> -->
+        <form action="/dashboard" method="post">
+            <label for="amount">Amount:</label>
+            <input type="number" name="amount" required>
+
+            <label for="description">Description:</label>
+            <input type="text" name="description" required>
+
+            <!-- Category Dropdown Start -->
+            <label for="category">Category:</label>
+            <select name="category">
+                {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+            <!-- Category Dropdown End -->
+
+            <label for="transaction_date">Transaction Date:</label>
+            <input type="date" name="transaction_date" class="shorter-input" required>
+            <!-- <input type="date" name="transaction_date" required> -->
+
+            <input type="submit" value="Add Transaction">
+        </form>
+
+        <h2>Total Spending Last 24h: $<span id="total_spending">0</span></h2>
+
+        <h2>Top 3 Expense Categories</h2>
+        <ul>
+            {% for category, total in top_expenses %}
+            <li><strong>{{ category }}</strong>: ${{ total }}</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Monthly Spending Trends</h2>
+        <canvas id="monthlySpendingChart" width="400" height="100"></canvas>
+        <style>
+            #monthlySpendingChart {
+                width: 100%;  /* Responsive Width */
+                max-width: 600px;
+                display: block;
+                margin: 20px auto;
+            }
+        </style>
+
+        <h2>Last 10 Transactions</h2>
+        {% if transactions %}
+        <ul>
+            {% for transaction in transactions %}
+            <li>
+                <strong>Date:</strong> {{ transaction.date.strftime('%Y-%m-%d %H:%M:%S') }},
+                <strong>Amount:</strong> {{ transaction.amount }},
+                <strong>Description:</strong> {{ transaction.description }}
+            </li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No transactions to display.</p>
+        {% endif %}
+    </div>
+    <script>
+        function fetchTotalSpending() {
+            fetch('/api/total_spending_last_24h')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('total_spending').innerText = data.total_spending.toFixed(2);
+                });
+        }
+        // Fetch immediately and then every 5 seconds.
+        fetchTotalSpending();
+        setInterval(fetchTotalSpending, 5000);
+
+        // Monthly spending line chart
+        var ctx = document.getElementById('monthlySpendingChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: {{ (monthly_totals | map(attribute='month') | list if monthly_totals else []) | tojson }},
+                datasets: [{
+                    label: 'Spending ($)',
+                    data: {{ (monthly_totals | map(attribute='total_amount') | list if monthly_totals else []) | tojson }},
+                    fill: false,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                }]
+            }
+        });
+    </script>
+
+</body>
+</html>
